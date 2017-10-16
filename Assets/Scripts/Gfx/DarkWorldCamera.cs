@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class HoleCamera : MonoBehaviour {
-    public Material mat;
+public class DarkWorldCamera : MonoBehaviour {
+    public Material m;
 
-	void OnEnable () {
+    private void OnEnable() {
         var cam = GetComponent<Camera>();
 
         if (cam.targetTexture != null) {
@@ -17,6 +17,6 @@ public class HoleCamera : MonoBehaviour {
 
         cam.targetTexture = new RenderTexture(cam.pixelWidth, cam.pixelHeight, 16);
         cam.targetTexture.filterMode = FilterMode.Bilinear;
-        mat.SetTexture("_Mask", cam.targetTexture);
+        m.SetTexture("_DarkWorld", cam.targetTexture);
     }
 }
