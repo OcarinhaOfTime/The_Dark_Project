@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: f0b55952f35048c46ab85b963d55f2cb
+timeCreated: 1508276536
+licenseType: Pro
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Banaue
+  fontNames:
+  - Banaue
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
