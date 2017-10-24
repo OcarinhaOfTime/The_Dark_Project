@@ -34,6 +34,7 @@
 			struct v2f
 			{
 				float2 uv : TEXCOORD0;
+				float2 uv1 : TEXCOORD1;
 				float4 vertex : SV_POSITION;
 				half4 color : COLOR;
 			};
@@ -49,13 +50,17 @@
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				o.color = v.color;
+				o.uv1 = o.vertex.xy / o.vertex.w;
+				o.uv1 = (o.uv1 + 1) * .5;
+				//o.uv1.x = 1 - o.uv1.x;
 				return o;
 			}
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
 				fixed4 col = tex2D(_MainTex, i.uv);
-				fixed4 grad = tex2D(_Gradient, i.uv);
+				fixed4 grad = tex2D(_Gradient, i.uv1);
+				col.rgb = 1 - col.rgb;
 				clip(grad.r - _Cutoff);
 				return col * i.color * i.color.a;
 			}

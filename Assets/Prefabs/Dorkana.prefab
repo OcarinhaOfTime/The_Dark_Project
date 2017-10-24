@@ -318,7 +318,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeReachMax: 0.1
   timeToStop: 0.01
-  max_speed: 10
+  max_speed: 20
+  jump_height: 7
+  jump_duration: 0.33
+  fallMultiplier: 1.2
   velocity: {x: 0, y: 0}
   deltaVelocity: {x: 0, y: 0}
   groundMask:
@@ -333,7 +336,7 @@ MonoBehaviour:
     descendingSlope: 0
     slopeAngle: 0
     slopeAngleOld: 0
-  g: -24
+  jumps: 2
 --- !u!212 &212067430680151426
 SpriteRenderer:
   m_ObjectHideFlags: 1

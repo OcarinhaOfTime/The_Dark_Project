@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-    private PlayerController controller;
+    private PlayerMovement controller;
     private Animator animator;
 
     private void Start() {
-        controller = GetComponent<PlayerController>();
+        controller = GetComponent<PlayerMovement>();
         animator = GetComponentInChildren<Animator>();
     }
 

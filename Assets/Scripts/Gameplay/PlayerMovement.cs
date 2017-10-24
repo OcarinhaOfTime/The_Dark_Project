@@ -2,17 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour {
     public float timeReachMax = .5f;
     public float timeToStop = .25f;
     public float max_speed = 10;
+    public float jump_height = 5;
+    public float jump_duration = 1;
+    public float fallMultiplier = 1;
 
     public Vector2 velocity;
     public Vector2 deltaVelocity;
 
-    public LayerMask groundMask = (1 << 8);     
-    
+    public LayerMask groundMask = (1 << 8);
+
     public CollisionInfo collisionInfo = new CollisionInfo();
+    public int jumps = 2;
     public bool grounded { get; private set; }
 
     private float lastDir;
@@ -23,6 +27,7 @@ public class PlayerController : MonoBehaviour {
     private int verticalRayCount = 4;
     private float horizontalRaySpacing;
     private float verticalRaySpacing;
+    private int jumpCounter;
     private const float MaxClimbSlope = 60;
 
     private Collider2D col;
@@ -41,7 +46,16 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public float g = 24;
+    private float jump_vel {
+        get {
+            return 2 * jump_height / jump_duration;
+        }
+    }
+    public float g {
+        get {
+            return (-2 * jump_height) / (jump_duration * jump_duration);
+        }
+    }
 
     public bool facingRight {
         get {
@@ -81,16 +95,26 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void Move(float h_input, bool jump) {
-        if(h_input == 0) {
+        if (h_input == 0) {
             velocity.x -= desacceleration * lastDir * Time.fixedDeltaTime;
-            
-            if(Sign(velocity.x) != lastDir) {
+
+            if (Sign(velocity.x) != lastDir) {
                 lastDir = 0;
                 velocity.x = 0;
             }
         } else {
             velocity.x += h_input * acceleration * Time.fixedDeltaTime;
             lastDir = h_input;
+        }
+
+        if (jump && jumpCounter < jumps) {
+            velocity.y = jump_vel;
+
+            if (jumpCounter > 0) {
+                //animator.SetTrigger("DoubleJump");
+            }
+
+            jumpCounter++;
         }
     }
 
@@ -101,7 +125,7 @@ public class PlayerController : MonoBehaviour {
 
         Move(Input.GetAxisRaw("Horizontal"), Input.GetButtonDown("Jump"));
 
-        velocity.y += g * Time.deltaTime;
+        velocity.y += g * Time.deltaTime * (velocity.y < 0 ? fallMultiplier : 1);
         velocity.x = Mathf.Clamp(velocity.x, -max_speed, max_speed);
 
         deltaVelocity = Time.deltaTime * velocity;
@@ -113,9 +137,9 @@ public class PlayerController : MonoBehaviour {
             DescendSlope();
         }
 
-        if (deltaVelocity.x != 0) {
-            HorizontalCollisions();
-        }
+        //if (deltaVelocity.x != 0) {
+        HorizontalCollisions();
+        //}
 
         if (deltaVelocity.y != 0) {
             VerticalCollisions();
@@ -129,9 +153,10 @@ public class PlayerController : MonoBehaviour {
         //animator.SetFloat("VSpeed", velocity.y);
         //animator.SetBool("Run", Mathf.Abs(velocity.x) > .1f);
         //animator.SetBool("Grounded", grounded);
-    }    
+    }
 
     void OnLand() {
+        jumpCounter = 0;
     }
 
     void HorizontalCollisions() {
@@ -148,9 +173,9 @@ public class PlayerController : MonoBehaviour {
             if (hit) {
                 var angle = Vector2.Angle(hit.normal, Vector2.up);
 
-                if(i ==0 && angle <= MaxClimbSlope) {
+                if (i == 0 && angle <= MaxClimbSlope) {
                     var distanceToSlopeStart = 0f;
-                    if(collisionInfo.slopeAngleOld != angle) {
+                    if (collisionInfo.slopeAngleOld != angle) {
                         distanceToSlopeStart = hit.distance - skin_width;
                         deltaVelocity.x -= distanceToSlopeStart * dir;
                     }
@@ -158,7 +183,7 @@ public class PlayerController : MonoBehaviour {
                     deltaVelocity.x += distanceToSlopeStart * dir;
                 }
 
-                if(!collisionInfo.climbingSlope || angle > MaxClimbSlope) {
+                if (!collisionInfo.climbingSlope || angle > MaxClimbSlope) {
                     deltaVelocity.x = (hit.distance - skin_width) * dir;
                     rayLength = hit.distance;
 
@@ -168,7 +193,7 @@ public class PlayerController : MonoBehaviour {
 
                     collisionInfo.left = dir < 0;
                     collisionInfo.right = dir > 0;
-                }                                
+                }
             }
         }
     }
@@ -217,7 +242,7 @@ public class PlayerController : MonoBehaviour {
 
         grounded = false;
 
-        for (int i=0; i< verticalRayCount; i++) {
+        for (int i = 0; i < verticalRayCount; i++) {
             var pos = dir < 0 ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;
             pos += Vector2.right * (verticalRaySpacing * i + deltaVelocity.x);
 
@@ -245,10 +270,10 @@ public class PlayerController : MonoBehaviour {
 
             if (hit) {
                 var angle = Vector2.Angle(hit.normal, Vector2.up);
-                if(angle != collisionInfo.slopeAngle) {
+                if (angle != collisionInfo.slopeAngle) {
                     deltaVelocity.x = (hit.distance - skin_width) * dir;
                     collisionInfo.slopeAngle = angle;
-                }                
+                }
             }
         }
 
