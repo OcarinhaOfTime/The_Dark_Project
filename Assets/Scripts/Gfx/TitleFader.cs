@@ -9,4 +9,8 @@ public class TitleFader : MonoBehaviour {
 	void Start () {
         this.LerpRoutine(duration, (t) => m.SetFloat("_Cutoff", 1 - t));
 	}
+
+    void OnDestroy() {
+        m.SetFloat("_Cutoff", 1);
+    }
 }
